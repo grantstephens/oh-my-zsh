@@ -3,7 +3,7 @@
 ### NVM
 
 ZSH_THEME_NVM_PROMPT_PREFIX="%B⬡%b "
-ZSH_THEME_NVM_PROMPT_SUFFIX=""
+ZSH_THEME_NVM_PROMPT_SUFFIX=" "
 
 ### PYTHON
 
@@ -84,7 +84,7 @@ bureau_git_prompt () {
     fi
     _result="$_result$ZSH_THEME_GIT_PROMPT_SUFFIX"
   fi
-  echo $_result
+  echo " ${_result}"
 }
 
 
@@ -106,7 +106,7 @@ get_space () {
   local zero='%([BSUbfksu]|([FB]|){*})'
   local LENGTH=${#${(S%%)STR//$~zero/}}
   local SPACES=""
-  (( LENGTH = ${COLUMNS} - $LENGTH - 1))
+  (( LENGTH = ${COLUMNS} - $LENGTH - 2))
 
   for i in {0..$LENGTH}
     do
@@ -117,21 +117,27 @@ get_space () {
 }
 
 status_prompt () {
-  echo \($?\)\[$(date +%T)\]
+  RETVAL=$?
+  if [[ $RETVAL -eq 0 ]]; then
+      RET="%{$fg_bold[green]%}✓%{$reset_color%}"
+  else
+      RET="%{$fg_bold[red]%}x${RETVAL}%{$reset_color%}"
+  fi
+  echo "[${RET} $(date +%T)]"
 }
 
 _1LEFT="$_PATH"
 
 bureau_precmd () {
   stat=`status_prompt`
-  _1SPACES=`get_space $_1LEFT $stat`
+  _1SPACES=`get_space $_1LEFT  $stat`
   print
   print -rP "$_1LEFT$_1SPACES$stat"
 }
 
 setopt prompt_subst
 PROMPT='> $_LIBERTY '
-RPROMPT=' [$(go_prompt_info) $(python_prompt_info) $(nvm_prompt_info)$(bureau_git_prompt)]'
+RPROMPT='  [$(go_prompt_info) $(python_prompt_info)$(nvm_prompt_info)$(bureau_git_prompt)]'
 
 autoload -U add-zsh-hook
 add-zsh-hook precmd bureau_precmd
