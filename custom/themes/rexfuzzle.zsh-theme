@@ -7,7 +7,7 @@ ZSH_THEME_NVM_PROMPT_SUFFIX=""
 
 ### PYTHON
 
-ZSH_THEME_PYTHON_PROMPT_PREFIX="%B🐍%b"
+ZSH_THEME_PYTHON_PROMPT_PREFIX="%Bpy%b"
 ZSH_THEME_PYTHON_PROMPT_SUFFIX=""
 
 ### GO
@@ -116,13 +116,17 @@ get_space () {
   echo $SPACES
 }
 
+status_prompt () {
+  echo \($?\)\[$(date +%T)\]
+}
+
 _1LEFT="$_PATH"
-_1RIGHT="[%*] "
 
 bureau_precmd () {
-  _1SPACES=`get_space $_1LEFT $_1RIGHT`
+  stat=`status_prompt`
+  _1SPACES=`get_space $_1LEFT $stat`
   print
-  print -rP "$_1LEFT$_1SPACES$_1RIGHT"
+  print -rP "$_1LEFT$_1SPACES$stat"
 }
 
 setopt prompt_subst
